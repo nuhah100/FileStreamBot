@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  web_server:
+      build: .
+      restart: unless-stopped
+      container_name: web_server
+      environment:
+       - API_ID=${API_ID} # change this to your ID
+       - API_HASH=${API_HASH} # change this to your HASH
+       - BOT_TOKEN=${BOT_TOKEN} # enter your bot token
+       - BIN_CHANNEL=${BIN_CHANNEL} # paste channel ID
+       - ALLOWED_USERS=${ALLOWED_USERS}
+       - FQDN=${FQDN}
+      ports:
+       - 8080:8080
+      volumes:
+       - ./:/app/
