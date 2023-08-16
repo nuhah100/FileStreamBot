@@ -164,8 +164,6 @@ In addition to the mandatory variables, you can also set the following optional 
 > Leave this field empty and anyone will be able to use your bot instance.
 > You may also add multiple users by adding the IDs separated by comma (,)
 
-- `HASH_LENGTH` : This is the custom hash length for generated URLs. The hash length must be greater than 5 and less than 64.
-
 
 - `SLEEP_THRESHOLD` : This sets the sleep threshold for flood wait exceptions that occur globally in the bot instance. Requests that raise flood wait exceptions below this threshold will be automatically invoked again after sleeping for the required amount of time. Flood wait exceptions requiring longer waiting times will be raised. The default value is 60 seconds. Better leave this field empty.
 
