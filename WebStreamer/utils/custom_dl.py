@@ -31,7 +31,8 @@ class ByteStreamer:
         This is a modified version of the <https://github.com/eyaadh/megadlbot_oss/blob/master/mega/telegram/utils/custom_download.py>
         Thanks to Eyaadh <https://github.com/eyaadh>
         """
-        self.clean_timer = 30 * 60
+        self.org_chunks = 1
+        self.cached_chunks = 1
         self.client: Client = client
 
     async def get_file_properties(self, message_id: int) -> FileId:
@@ -40,7 +41,7 @@ class ByteStreamer:
         if the properties are cached, then it'll return the cached results.
         or it'll generate the properties from the Message ID and cache them.
         """
-        if message_id not in file_id_cache.keys():
+        if message_id not in file_id_cache:
             await self.generate_file_properties(message_id)
             logger.debug(f"Cached file properties for message with ID {message_id}")
         
@@ -189,9 +190,10 @@ class ByteStreamer:
 
         try:
             while True:
-                cache_key = f'{str(location.id)}-{str(offset)}-{str(chunk_size)}'
-                if cache_key in video_cache.keys():
+                cache_key = f'{str(file_id.media_id)}-{str(offset)}-{str(chunk_size)}'
+                if cache_key in video_cache:
                     chunk = video_cache[cache_key]
+                    self.cached_chunks += 1
                 else:
                     r = await media_session.invoke(
                         raw.functions.upload.GetFile(
@@ -218,11 +220,14 @@ class ByteStreamer:
                 current_part += 1
                 offset += chunk_size
 
+                # update chunks number
+                self.org_chunks += 1
+
                 if current_part > part_count:
                     break
     
         except (TimeoutError, AttributeError):
             pass
         finally:
-            logger.debug(f"Finished yielding file with {current_part} parts.")
+            logger.debug(f"Finished yielding file with {current_part} parts. ({self.cached_chunks} / {self.org_chunks} cached ({(self.cached_chunks * 100) / self.org_chunks}%))")
             work_loads[index] -= 1
