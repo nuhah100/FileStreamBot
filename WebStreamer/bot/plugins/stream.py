@@ -13,7 +13,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 @StreamBot.on_message((filters.video | filters.document) & filters.chat(Var.BIN_CHANNEL) & (filters.InvertFilter(filters.me)))
 async def on_new_video(_, m: Message):
-    logger.info(f"Generated link: '{Var.URL}videos/{m.id}' for {m.from_user.first_name}")
+    logger.info(f"Generated link: '{Var.URL}videos/{m.id}'")
 
     db.add_video(m.id, get_name(m), f"{Var.URL}videos/{m.id}")
 
