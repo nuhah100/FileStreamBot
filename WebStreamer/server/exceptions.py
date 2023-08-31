@@ -1,2 +1,2 @@
-class FIleNotFound(Exception):
+class FileNotFound(Exception):
     message = "File not found"

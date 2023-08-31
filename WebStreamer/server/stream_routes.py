@@ -10,14 +10,17 @@ import mimetypes
 from aiohttp import web
 from aiohttp.http_exceptions import BadStatusLine
 from WebStreamer.bot import multi_clients, work_loads
-from WebStreamer.server.exceptions import FIleNotFound
+from WebStreamer.utils.db import VideoDB
+from WebStreamer.server.exceptions import FileNotFound
 from WebStreamer import Var, utils, StartTime, __version__, StreamBot
 from itertools import tee
+
 
 logger = logging.getLogger("routes")
 
 
 routes = web.RouteTableDef()
+db = VideoDB()
 
 @routes.get("/", allow_head=True)
 async def root_route_handler(_):
@@ -37,16 +40,23 @@ async def root_route_handler(_):
         }
     )
 
+@routes.get("/api")
+async def get_videos(request: web.Request):
+    return web.json_response(
+        db.get_videos()
+    )
 
-@routes.get(r"/{path:\S+}", allow_head=True)
+@routes.get(r"/videos/{path:\S+}", allow_head=True)
 async def stream_handler(request: web.Request):
     try:
         path = request.match_info["path"]
         match = re.search(r"^(\d+)", path)
         if match:
             message_id = int(match.group(1))
-        return await media_streamer(request, message_id)
-    except FIleNotFound as e:
+            return await media_streamer(request, message_id)
+
+        raise FileNotFound(f"Match not found in {path}")
+    except FileNotFound as e:
         raise web.HTTPNotFound(text=e.message)
     except (AttributeError, BadStatusLine, ConnectionResetError):
         pass

@@ -120,3 +120,4 @@ sessions/
 .env
 test.py
 .vscode/
+*.sqlite

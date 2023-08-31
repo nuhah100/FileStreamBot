@@ -8,7 +8,7 @@ from pyrogram import Client, utils, raw
 from .file_properties import get_file_ids
 from pyrogram.session import Session, Auth
 from pyrogram.errors import AuthBytesInvalid
-from WebStreamer.server.exceptions import FIleNotFound
+from WebStreamer.server.exceptions import FileNotFound
 from pyrogram.file_id import FileId, FileType, ThumbnailSource
 
 logger = logging.getLogger("streamer")
@@ -50,14 +50,14 @@ class ByteStreamer:
     async def generate_file_properties(self, message_id: int) -> FileId:
         """
         Generates the properties of a media file on a specific message.
-        returns ths properties in a FIleId class.
+        returns ths properties in a FileId class.
         """
         file_id = await get_file_ids(self.client, Var.BIN_CHANNEL, message_id)
         logger.debug(f"Generated file ID and Unique ID for message with ID {message_id}")
         
         if not file_id:
             logger.debug(f"Message with ID {message_id} not found")
-            raise FIleNotFound
+            raise FileNotFound
         
         file_id_cache[message_id] = file_id
         logger.debug(f"Cached media message with ID {message_id}")
